@@ -48,7 +48,7 @@ javascript:(function()%7B%20var%20ID='__mw_bulk_exporter__';%20if(document.getEl
 ## 🎬 How to Use
 
 ```text
-1. Open  →  https://ytcs.mattw.io/  (or any MW bulk-results page)
+1. Open  →  https://mattw.io/youtube-metadata/bulk/ 
 2. Paste →  a YouTube channel / playlist URL, click Submit
 3. Wait  →  for all rows to fully load in the results table
 4. Click →  the "MW Bulk Export" bookmarklet in your bar
@@ -92,8 +92,8 @@ When activated, the overlay panel shows:
 │  247 videos  │  12 fields  │ channel/url │
 ├─────────────────────────────────────────┤
 │  ┌──────────────────────────────────┐   │
-│  │ Title        │ Views  │ Duration │   │  ← 5-row
-│  │ Video One …  │ 1.2M   │ 10:45    │   │    preview
+│  │ Title        │ Views  │ Duration │   │  
+│  │ Video One …  │ 1.2M   │ 10:45    │   │   
 │  │ Video Two …  │ 843K   │ 8:22     │   │
 │  └──────────────────────────────────┘   │
 │  … 242 more rows in file                │
