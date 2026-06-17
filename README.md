@@ -14,6 +14,8 @@
 
 Export the **entire bulk metadata table** — videos, channels, playlists — to **CSV**, **TSV**, **JSON**, or **Markdown** instantly, in the browser, with zero setup.
 
+For a single video analysis export, use [Export-MW-Metadata-Analysis-Results](https://github.com/Provereno-Media/Export-MW-Metadata-Analysis-Results/)
+
 <br/>
 
 </div>
