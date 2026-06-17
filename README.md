@@ -97,9 +97,5 @@ This preserves both the human-readable label and the full URL in a single field,
 
 ***
 
-## 📄 License
-
-**[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**
-
 Built by **Pavel "Pogoda" Bannikov** for [Provereno.Media](https://provereno.media), 2026.  
 Bookmarklet for bulk-results pages powered by [Matt Wright's YouTube tools](https://mattw.io).
