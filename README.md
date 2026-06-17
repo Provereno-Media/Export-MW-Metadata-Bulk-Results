@@ -24,7 +24,7 @@ Export the **entire bulk metadata table** — videos, channels, playlists — to
 ## 🚀 Installation
 
 ### Option A — Drag & Drop
-Open this page in a browser and just drag the button to your bookmarks bar
+Open [this page](https://provereno-media.github.io/Export-MW-Metadata-Bulk-Results/) in a browser and just drag the button to your bookmarks bar
 
 ### Option B — Manual
 
