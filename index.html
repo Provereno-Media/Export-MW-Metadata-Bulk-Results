@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MW Bulk Exporter — Bookmarklet Installer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0d0c;--surface:#1c1b19;--surface-2:#201f1d;--surface-3:#262523;
+  --border:#393836;--divider:#262523;
+  --text:#cdccca;--text-muted:#797876;--text-faint:#5a5957;
+  --primary:#4f98a3;--primary-dark:#01696f;--primary-glow:rgba(79,152,163,.18);
+  --success:#6daa45;--warning:#fdab43;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --mono:'JetBrains Mono',monospace;
+}
+html{-webkit-font-smoothing:antialiased;color-scheme:dark}
+body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+
+.page{max-width:700px;margin:0 auto;padding:48px 20px 80px}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:56px}
+.logo{display:inline-flex;align-items:center;gap:12px;margin-bottom:20px}
+.logo-icon{width:48px;height:48px;background:var(--primary-glow);border:1px solid rgba(79,152,163,.3);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.logo-name{font-size:20px;font-weight:700;color:#e8e7e5;letter-spacing:-.02em}
+.logo-sub{font-size:12px;color:var(--text-faint);font-weight:400}
+h1{font-size:clamp(26px,4vw,38px);font-weight:700;color:#f0efed;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px}
+.tagline{font-size:15px;color:var(--text-muted);max-width:480px;margin:0 auto}
+
+/* BADGES */
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.04em;border:1px solid}
+.badge-teal{color:var(--primary);border-color:rgba(79,152,163,.3);background:var(--primary-glow)}
+.badge-green{color:var(--success);border-color:rgba(109,170,69,.25);background:rgba(109,170,69,.08)}
+.badge-gray{color:var(--text-faint);border-color:var(--border);background:var(--surface)}
+
+/* INSTALL CARD */
+.install-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+.install-header{padding:20px 24px 16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:10px}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.install-header h2{font-size:15px;font-weight:600;color:#e8e7e5;letter-spacing:-.01em}
+.install-body{padding:20px 24px}
+
+/* DRAG ZONE */
+.drag-zone{background:var(--surface-2);border:1.5px dashed rgba(79,152,163,.4);border-radius:var(--radius-sm);padding:28px 20px;text-align:center;margin-bottom:0;transition:border-color .2s,background .2s}
+.drag-zone:hover{border-color:var(--primary);background:rgba(79,152,163,.06)}
+.drag-hint{font-size:12px;color:var(--text-faint);margin-bottom:14px}
+.drag-hint strong{color:var(--text-muted)}
+
+/* BOOKMARKLET BUTTON */
+.bm-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:linear-gradient(135deg,#01696f,#4f98a3);color:#fff;border:none;border-radius:var(--radius-sm);font-family:Inter,sans-serif;font-size:14px;font-weight:600;cursor:grab;text-decoration:none;box-shadow:0 4px 16px rgba(79,152,163,.3);transition:box-shadow .2s,transform .15s;user-select:none;-webkit-user-drag:element}
+.bm-btn:hover{box-shadow:0 6px 24px rgba(79,152,163,.45);transform:translateY(-1px)}
+.bm-btn:active{cursor:grabbing;transform:translateY(0)}
+.bm-btn svg{flex-shrink:0}
+
+.drag-arrow{margin-top:12px;font-size:12px;color:var(--text-faint);display:flex;align-items:center;justify-content:center;gap:6px}
+.arrow-anim{display:inline-block;animation:arrowBounce 1.4s ease-in-out infinite}
+@keyframes arrowBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* MANUAL INSTALL */
+.manual-section{margin-top:16px;border-top:1px solid var(--divider);padding-top:16px}
+.manual-toggle{background:none;border:none;color:var(--text-muted);font:500 12px/1 Inter,sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0}
+.manual-toggle:hover{color:var(--text)}
+.manual-toggle svg{transition:transform .2s}
+.manual-toggle.open svg{transform:rotate(90deg)}
+.manual-body{display:none;margin-top:12px}
+.manual-body.visible{display:block}
+.code-wrap{position:relative;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 40px 12px 14px;overflow:auto;max-height:120px}
+.code-wrap code{font-family:var(--mono);font-size:11px;color:#797876;word-break:break-all;display:block;line-height:1.6}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--text-muted);cursor:pointer;transition:color .15s,background .15s}
+.copy-btn:hover{color:var(--text);background:var(--surface-3)}
+
+/* HOW TO USE */
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-icon{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:var(--primary);font-weight:600;background:var(--surface-2)}
+.step-text strong{color:#e8e7e5;font-size:13px;font-weight:600;display:block;margin-bottom:2px}
+.step-text span{font-size:12px;color:var(--text-muted)}
+code.inline{font-family:var(--mono);font-size:11px;background:var(--surface-3);padding:2px 6px;border-radius:4px;color:var(--primary)}
+
+/* FORMATS TABLE */
+.formats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px}
+@media(max-width:480px){.formats-grid{grid-template-columns:1fr 1fr}}
+.format-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:12px 10px;text-align:center}
+.format-label{font-size:16px;font-weight:700;color:var(--primary);font-family:var(--mono);margin-bottom:4px}
+.format-desc{font-size:11px;color:var(--text-faint);line-height:1.4}
+
+/* FEATURES */
+.features{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:440px){.features{grid-template-columns:1fr}}
+.feat{display:flex;gap:10px;align-items:flex-start;padding:12px;background:var(--surface-2);border-radius:var(--radius-xs);border:1px solid var(--divider)}
+.feat-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.feat-text{font-size:12px;color:var(--text-muted);line-height:1.5}
+.feat-text strong{color:var(--text);font-size:12px;display:block;font-weight:600;margin-bottom:1px}
+
+/* PREVIEW MOCK */
+.mock-overlay{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;width:100%;max-width:360px;margin:0 auto;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.mock-header{padding:12px 14px 10px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
+.mock-title{font-size:12px;font-weight:600;color:#e8e7e5}
+.mock-x{width:20px;height:20px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-faint)}
+.mock-stats{padding:10px 14px;border-bottom:1px solid var(--divider);display:flex;gap:12px}
+.mock-stat{text-align:center;flex:1}
+.mock-stat-val{font-size:20px;font-weight:700;color:var(--primary)}
+.mock-stat-lbl{font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em}
+.mock-row{display:flex;padding:4px 14px;font-size:10px;border-bottom:1px solid rgba(38,37,35,.5)}
+.mock-row:nth-child(even){background:rgba(32,31,29,.6)}
+.mock-key{color:var(--text-faint);width:100px;flex-shrink:0}
+.mock-val{color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mock-btns{padding:10px 14px;display:flex;gap:6px}
+.mock-btn{flex:1;padding:6px 0;border-radius:6px;font-size:10px;font-weight:600;text-align:center}
+.mock-btn-p{background:var(--primary-dark);color:#fff}
+.mock-btn-s{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border)}
+
+/* FOOTER */
+.footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--text-faint)}
+.footer-left a{color:var(--text-muted);text-decoration:none}
+.footer-left a:hover{color:var(--text)}
+.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:12px;color:var(--text-faint);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--primary)}
+
+/* NOTIFY */
+#notify{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 16px;font-size:12px;color:var(--success);box-shadow:0 4px 20px rgba(0,0,0,.4);transform:translateY(60px);opacity:0;transition:transform .3s,opacity .3s;pointer-events:none;z-index:999}
+#notify.show{transform:translateY(0);opacity:1}
+
+section{margin-bottom:32px}
+.section-title{font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--divider)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="2" y="5" width="22" height="14" rx="3" stroke="#4f98a3" stroke-width="1.5"/>
+          <path d="M9 9l8 4-8 4V9z" fill="#4f98a3"/>
+          <path d="M2 22h8M14 22h10" stroke="#4f98a3" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">MW Bulk Exporter</div>
+        <div class="logo-sub">by Provereno.Media</div>
+      </div>
+    </div>
+    <h1>Export YouTube<br>Metadata in One Click</h1>
+    <p class="tagline">A bookmarklet for <strong style="color:#e8e7e5">mattw.io/youtube-metadata/bulk</strong> — download the results table as CSV, TSV, JSON or Markdown directly from your browser</p>
+    <div class="badges">
+      <span class="badge badge-teal">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Runs in browser, no server
+      </span>
+      <span class="badge badge-green">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        No tracking
+      </span>
+      <span class="badge badge-gray">~ 9 КБ</span>
+      <span class="badge badge-teal">CSV · TSV · JSON · MD</span>
+    </div>
+  </div>
+
+  <!-- INSTALL -->
+  <section>
+    <div class="section-title">Installation</div>
+    <div class="install-card">
+      <div class="install-header">
+        <div class="step-num">1</div>
+        <h2>Drag the button to your bookmarks bar</h2>
+      </div>
+      <div class="install-body">
+        <div class="drag-zone">
+          <div class="drag-hint"><strong>Make sure the bookmarks bar is visible</strong> (Ctrl+Shift+B / Cmd+Shift+B)</div>
+          <a id="bm-link" class="bm-btn" href="javascript:(function()%7B%20var%20ID='__mw_bulk_exporter__';%20if(document.getElementById(ID))%7Bdocument.getElementById(ID).remove();return;%7D%20function%20esc(s)%7Breturn%20String(s??'').replace(/&/g,'&amp;').replace(/%3C/g,'&lt;').replace(/%3E/g,'&gt;');%7D%20function%20ts()%7Breturn%20new%20Date().toISOString().replace(/[:.]/g,'-').slice(0,19);%7D%20function%20dl(content,name,mime)%7B%20var%20b=new%20Blob(['%5CuFEFF'+content],%7Btype:mime%7D);%20var%20a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;%20document.body.appendChild(a);a.click();%20setTimeout(function()%7BURL.revokeObjectURL(a.href);a.remove();%7D,1000);%20%7D%20function%20extractBulkTable()%7B%20var%20tables=document.querySelectorAll('table');%20var%20best=null,bestCols=0;%20tables.forEach(function(t)%7B%20var%20ths=t.querySelectorAll('thead%20th,thead%20td');%20if(ths.length%3EbestCols)%7BbestCols=ths.length;best=t;%7D%20%7D);%20if(!best)return%7Bheaders:[],rows:[]%7D;%20var%20headers=[].slice.call(best.querySelectorAll('thead%20th,thead%20td')).map(function(th)%7Breturn%20th.innerText.trim();%7D);%20var%20rows=[].slice.call(best.querySelectorAll('tbody%20tr')).map(function(tr)%7B%20return%20[].slice.call(tr.querySelectorAll('td')).map(function(td)%7B%20var%20a=td.querySelector('a');%20if(a)%7B%20var%20title=a.innerText.trim();%20var%20href=a.href%7C%7C'';%20return%20title?title+'%20%7C%20'+href:href;%20%7D%20return%20td.innerText.trim();%20%7D);%20%7D);%20return%7Bheaders:headers,rows:rows%7D;%20%7D%20function%20toCSV(h,rows)%7B%20function%20q(v)%7Breturn'%22'+String(v??'').replace(/%22/g,'%22%22')+'%22';%7D%20return[h.map(q).join(',')].concat(rows.map(function(r)%7Breturn%20r.map(q).join(',');%7D)).join('%5Cn');%20%7D%20function%20toTSV(h,rows)%7B%20return[h.join('%5Ct')].concat(rows.map(function(r)%7Breturn%20r.join('%5Ct');%7D)).join('%5Cn');%20%7D%20function%20toJSON(h,rows)%7B%20var%20arr=rows.map(function(r)%7B%20var%20o=%7B%7D;h.forEach(function(k,i)%7Bo[k]=r[i]??'';%7D);return%20o;%20%7D);%20return%20JSON.stringify(arr,null,2);%20%7D%20function%20toMarkdown(h,rows)%7B%20var%20lines=['#%20MW%20Metadata%20Bulk%20Export','','%3E%20Source:%20'+window.location.href,'%3E%20Exported:%20'+new%20Date().toLocaleString(),''];%20var%20widths=h.map(function(c,i)%7Breturn%20Math.max(c.length,Math.max.apply(null,rows.map(function(r)%7Breturn%20String(r[i]??'').length;%7D)));%7D);%20function%20pad(s,w)%7Breturn%20String(s).slice(0,w).padEnd(w);%7D%20lines.push('%7C%20'+h.map(function(c,i)%7Breturn%20pad(c,widths[i]);%7D).join('%20%7C%20')+'%20%7C');%20lines.push('%7C%20'+widths.map(function(w)%7Breturn%20'-'.repeat(w);%7D).join('%20%7C%20')+'%20%7C');%20rows.forEach(function(r)%7Blines.push('%7C%20'+r.map(function(v,i)%7Breturn%20pad(String(v??'').replace(/%5Cn/g,'%20'),widths[i]);%7D).join('%20%7C%20')+'%20%7C');%7D);%20return%20lines.join('%5Cn');%20%7D%20var%20d=extractBulkTable();%20var%20inputEl=document.querySelector('input[aria-label],input[type=%22text%22]');%20var%20channelUrl=inputEl?inputEl.value:'';%20var%20stamp=ts();%20var%20ov=document.createElement('div');%20ov.id=ID;%20ov.setAttribute('role','dialog');%20ov.setAttribute('aria-label','MW%20Metadata%20Exporter');%20var%20styles=[%20'position:fixed','top:16px','right:16px','z-index:2147483647',%20'width:360px','max-height:calc(100vh%20-%2032px)',%20'background:#1c1b19','color:#cdccca',%20'border:1px%20solid%20#393836','border-radius:14px',%20'box-shadow:0%2016px%2048px%20rgba(0,0,0,.7)',%20'font:13px/1.5%20Inter,system-ui,sans-serif',%20'overflow:hidden','display:flex','flex-direction:column'%20].join(';');%20ov.style.cssText=styles;%20var%20previewRows=d.rows.slice(0,5);%20ov.innerHTML=[%20'%3Cdiv%20style=%22padding:14px%2016px%2010px;border-bottom:1px%20solid%20#262523;display:flex;align-items:center;justify-content:space-between;gap:8px%22%3E',%20'%3Cdiv%20style=%22display:flex;align-items:center;gap:8px%22%3E',%20'%3Csvg%20width=%2222%22%20height=%2222%22%20viewBox=%220%200%2022%2022%22%20fill=%22none%22%20style=%22flex-shrink:0%22%3E%3Crect%20width=%2222%22%20height=%2222%22%20rx=%226%22%20fill=%22#4f98a3%22%20opacity=%22.18%22/%3E%3Cpath%20d=%22M5%208h12M5%2011h8M5%2014h6%22%20stroke=%22#4f98a3%22%20stroke-width=%221.5%22%20stroke-linecap=%22round%22/%3E%3C/svg%3E',%20'%3Cdiv%3E',%20'%3Cdiv%20style=%22font-weight:600;font-size:13px;color:#e8e7e5;letter-spacing:-.01em%22%3EMW%20Bulk%20Exporter%3C/div%3E',%20'%3Cdiv%20style=%22font-size:11px;color:#5a5957%22%3Eby%20Provereno.Media%3C/div%3E',%20'%3C/div%3E',%20'%3C/div%3E',%20'%3Cbutton%20id=%22__mw_x__%22%20title=%22%D0%97%D0%B0%D0%BA%D1%80%D1%8B%D1%82%D1%8C%22%20style=%22background:none;border:none;cursor:pointer;color:#5a5957;padding:4px;border-radius:6px;line-height:1;font-size:18px%22%20onmouseenter=%22this.style.color=%5C'#cdccca%5C'%22%20onmouseleave=%22this.style.color=%5C'#5a5957%5C'%22%3E%C3%97%3C/button%3E',%20'%3C/div%3E',%20'%3Cdiv%20style=%22padding:10px%2016px;border-bottom:1px%20solid%20#262523;background:#1d1c1a%22%3E',%20'%3Cdiv%20style=%22display:flex;gap:16px%22%3E',%20'%3Cdiv%20style=%22text-align:center;flex:1%22%3E',%20'%3Cdiv%20style=%22font-size:22px;font-weight:700;color:#4f98a3;font-variant-numeric:tabular-nums%22%3E'+d.rows.length+'%3C/div%3E',%20'%3Cdiv%20style=%22font-size:10px;color:#5a5957;text-transform:uppercase;letter-spacing:.06em%22%3E%D0%B2%D0%B8%D0%B4%D0%B5%D0%BE%3C/div%3E',%20'%3C/div%3E',%20'%3Cdiv%20style=%22width:1px;background:#262523%22%3E%3C/div%3E',%20'%3Cdiv%20style=%22text-align:center;flex:1%22%3E',%20'%3Cdiv%20style=%22font-size:22px;font-weight:700;color:#4f98a3;font-variant-numeric:tabular-nums%22%3E'+d.headers.length+'%3C/div%3E',%20'%3Cdiv%20style=%22font-size:10px;color:#5a5957;text-transform:uppercase;letter-spacing:.06em%22%3E%D0%BF%D0%BE%D0%BB%D0%B5%D0%B9%3C/div%3E',%20'%3C/div%3E',%20'%3Cdiv%20style=%22width:1px;background:#262523%22%3E%3C/div%3E',%20'%3Cdiv%20style=%22text-align:center;flex:1;overflow:hidden%22%3E',%20'%3Cdiv%20style=%22font-size:11px;font-weight:500;color:#797876;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px%22%20title=%22'+esc(channelUrl)+'%22%3E'+esc(channelUrl.replace(/https?:%5C/%5C/(www%5C.)?/,'').slice(0,26)+(channelUrl.length%3E32?'%E2%80%A6':''))+'%3C/div%3E',%20'%3Cdiv%20style=%22font-size:10px;color:#5a5957;text-transform:uppercase;letter-spacing:.06em%22%3E%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB/%D0%BF%D0%BB%D0%B5%D0%B9%D0%BB%D0%B8%D1%81%D1%82%3C/div%3E',%20'%3C/div%3E',%20'%3C/div%3E',%20'%3C/div%3E',%20d.headers.length%3E0?[%20'%3Cdiv%20style=%22flex:1;overflow-y:auto;max-height:200px%22%3E',%20'%3Ctable%20style=%22width:100%25;border-collapse:collapse;font-size:11px%22%3E',%20'%3Cthead%3E%3Ctr%3E'+d.headers.map(function(h)%7Breturn'%3Cth%20style=%22position:sticky;top:0;background:#201f1d;padding:5px%2010px;text-align:left;color:#797876;font-weight:600;white-space:nowrap;border-bottom:1px%20solid%20#262523%22%3E'+esc(h)+'%3C/th%3E';%7D).join('')+'%3C/tr%3E%3C/thead%3E',%20'%3Ctbody%3E'+previewRows.map(function(r,ri)%7Breturn'%3Ctr%20style=%22background:'+(ri%252?'#1d1c1a':'#1c1b19')+'%22%3E'+r.map(function(v)%7Breturn'%3Ctd%20style=%22padding:4px%2010px;border-bottom:1px%20solid%20#1f1e1c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;color:#cdccca%22%20title=%22'+esc(v)+'%22%3E'+esc(String(v??'').slice(0,40))+'%3C/td%3E';%7D).join('')+'%3C/tr%3E';%7D).join('')+'%3C/tbody%3E',%20'%3C/table%3E',%20d.rows.length%3E5?'%3Cdiv%20style=%22padding:6px%2010px;font-size:10px;color:#5a5957;text-align:center;border-top:1px%20solid%20#262523%22%3E%E2%80%A6%D0%B5%D1%89%D1%91%20'+(d.rows.length-5)+'%20%D1%81%D1%82%D1%80%D0%BE%D0%BA%20%D0%B2%20%D1%84%D0%B0%D0%B9%D0%BB%D0%B5%3C/div%3E':'',%20'%3C/div%3E',%20].join(''):'%3Cdiv%20style=%22padding:20px;text-align:center;color:#5a5957;font-size:12px%22%3E%E2%9A%A0%20%D0%A2%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B0%20%D0%BD%D0%B5%20%D0%BD%D0%B0%D0%B9%D0%B4%D0%B5%D0%BD%D0%B0.%3Cbr%3E%D0%A1%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B0%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%B8%D1%82%D0%B5%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BD%D0%B0%20%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B5.%3C/div%3E',%20'%3Cdiv%20style=%22padding:12px%2016px;border-top:1px%20solid%20#262523;display:flex;gap:8px%22%3E',%20'%3Cbutton%20id=%22__mw_csv__%22%20style=%22flex:1;padding:8px%200;background:#01696f;color:#fff;border:none;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer;letter-spacing:.02em%22%20onmouseenter=%22this.style.background=%5C'#0c4e54%5C'%22%20onmouseleave=%22this.style.background=%5C'#01696f%5C'%22%3E%E2%AC%87%20CSV%3C/button%3E',%20'%3Cbutton%20id=%22__mw_tsv__%22%20style=%22flex:1;padding:8px%200;background:#262523;color:#cdccca;border:1px%20solid%20#393836;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer%22%20onmouseenter=%22this.style.background=%5C'#2d2c2a%5C'%22%20onmouseleave=%22this.style.background=%5C'#262523%5C'%22%3E%E2%AC%87%20TSV%3C/button%3E',%20'%3Cbutton%20id=%22__mw_json__%22%20style=%22flex:1;padding:8px%200;background:#262523;color:#cdccca;border:1px%20solid%20#393836;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer%22%20onmouseenter=%22this.style.background=%5C'#2d2c2a%5C'%22%20onmouseleave=%22this.style.background=%5C'#262523%5C'%22%3E%E2%AC%87%20JSON%3C/button%3E',%20'%3Cbutton%20id=%22__mw_md__%22%20style=%22flex:1;padding:8px%200;background:#262523;color:#cdccca;border:1px%20solid%20#393836;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer%22%20onmouseenter=%22this.style.background=%5C'#2d2c2a%5C'%22%20onmouseleave=%22this.style.background=%5C'#262523%5C'%22%3E%E2%AC%87%20MD%3C/button%3E',%20'%3C/div%3E',%20'%3Cdiv%20id=%22__mw_s__%22%20style=%22height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6daa45;background:#1a1f19;border-top:1px%20solid%20#262523;letter-spacing:.02em%22%3E%3C/div%3E',%20].join('');%20document.body.appendChild(ov);%20function%20notify(msg)%7B%20var%20s=document.getElementById('__mw_s__');%20if(s)%7Bs.textContent=msg;setTimeout(function()%7Bif(document.getElementById('__mw_s__'))document.getElementById('__mw_s__').textContent='';%7D,2500);%7D%20%7D%20document.getElementById('__mw_x__').addEventListener('click',function()%7Bov.remove();%7D);%20document.getElementById('__mw_csv__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toCSV(d.headers,d.rows),'yt-bulk-'+stamp+'.csv','text/csv;charset=utf-8');notify('%E2%9C%93%20CSV%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD%20('+d.rows.length+'%20%D1%81%D1%82%D1%80%D0%BE%D0%BA)');%20%7D);%20document.getElementById('__mw_tsv__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toTSV(d.headers,d.rows),'yt-bulk-'+stamp+'.tsv','text/tab-separated-values;charset=utf-8');notify('%E2%9C%93%20TSV%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD');%20%7D);%20document.getElementById('__mw_json__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toJSON(d.headers,d.rows),'yt-bulk-'+stamp+'.json','application/json');notify('%E2%9C%93%20JSON%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD');%20%7D);%20document.getElementById('__mw_md__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toMarkdown(d.headers,d.rows),'yt-bulk-'+stamp+'.md','text/markdown;charset=utf-8');notify('%E2%9C%93%20Markdown%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD');%20%7D);%0A%7D)();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="3" y="4" width="18" height="13" rx="2"/>
+              <path d="M8 20h8M12 17v3"/>
+            </svg>
+            MW Bulk Export
+          </a>
+          <div class="drag-arrow">
+            <span class="arrow-anim">↑</span>
+            Drag it here, onto your browser bookmarks bar
+          </div>
+        </div>
+
+        <div class="manual-section">
+          <button class="manual-toggle" id="manual-toggle" onclick="toggleManual()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            Install manually (copy code)
+          </button>
+          <div class="manual-body" id="manual-body">
+            <p style="font-size:12px;color:var(--text-faint);margin-bottom:8px;line-height:1.5">Create a new bookmark in your browser, name it <code class="inline">MW Bulk Export</code>, and paste the following into the <strong style="color:var(--text-muted)">URL / Address</strong> field:</p>
+            <div class="code-wrap">
+              <code id="bm-code"></code>
+              <button class="copy-btn" onclick="copyCode()">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO USE -->
+    <div class="install-card">
+      <div class="install-header">
+        <div class="step-num">2</div>
+        <h2>How to use</h2>
+      </div>
+      <div class="install-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-icon">1</div>
+            <div class="step-text">
+              <strong>Open mattw.io</strong>
+              <span>Navigate to <code class="inline">mattw.io/youtube-metadata/bulk</code></span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-icon">2</div>
+            <div class="step-text">
+              <strong>Load the data</strong>
+              <span>Paste a channel, playlist, or video URL → click <code class="inline">Submit</code> → wait for the full table to load</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-icon">3</div>
+            <div class="step-text">
+              <strong>Click the bookmarklet</strong>
+              <span>Click <code class="inline">MW Bulk Export</code> in your bookmarks bar — an overlay with a preview will appear</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-icon">4</div>
+            <div class="step-text">
+              <strong>Choose format and download</strong>
+              <span>CSV, TSV, JSON or Markdown — the file downloads instantly with a timestamp in the filename</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-icon" style="font-size:12px">✕</div>
+            <div class="step-text">
+              <strong>Close the overlay</strong>
+              <span>Click <code class="inline">×</code> or run the bookmarklet again — the overlay will close</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREVIEW -->
+  <section>
+    <div class="section-title">What the overlay looks like</div>
+    <div class="mock-overlay">
+      <div class="mock-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none"><rect width="22" height="22" rx="6" fill="#4f98a3" opacity=".18"/><path d="M5 8h12M5 11h8M5 14h6" stroke="#4f98a3" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div>
+            <div class="mock-title">MW Bulk Exporter</div>
+            <div style="font-size:9px;color:#5a5957">by Provereno.Media</div>
+          </div>
+        </div>
+        <div class="mock-x">×</div>
+      </div>
+      <div class="mock-stats">
+        <div class="mock-stat"><div class="mock-stat-val">248</div><div class="mock-stat-lbl">videos</div></div>
+        <div style="width:1px;background:#262523"></div>
+        <div class="mock-stat"><div class="mock-stat-val">12</div><div class="mock-stat-lbl">fields</div></div>
+        <div style="width:1px;background:#262523"></div>
+        <div class="mock-stat" style="overflow:hidden"><div style="font-size:10px;font-weight:500;color:#797876;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">youtube.com/@vdud</div><div class="mock-stat-lbl">channel</div></div>
+      </div>
+      <div class="mock-row"><span class="mock-key">Title</span><span class="mock-val">Фейгин – Чечня, Тесак…</span></div>
+      <div class="mock-row"><span class="mock-key">Author</span><span class="mock-val">вДудь</span></div>
+      <div class="mock-row"><span class="mock-key">Published</span><span class="mock-val">2026-06-16</span></div>
+      <div class="mock-row"><span class="mock-key">Views</span><span class="mock-val">125 432</span></div>
+      <div class="mock-row"><span class="mock-key">Likes</span><span class="mock-val">18 300</span></div>
+      <div style="padding:5px 14px;font-size:9px;color:#5a5957;text-align:center;border-bottom:1px solid #262523">…243 more rows in the file</div>
+      <div class="mock-btns">
+        <div class="mock-btn mock-btn-p">⬇ CSV</div>
+        <div class="mock-btn mock-btn-s">⬇ TSV</div>
+        <div class="mock-btn mock-btn-s">⬇ JSON</div>
+        <div class="mock-btn mock-btn-s">⬇ MD</div>
+      </div>
+      <div style="height:24px;background:#1a1f19;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6daa45;border-top:1px solid #262523">✓ CSV saved (248 rows)</div>
+    </div>
+  </section>
+
+  <!-- FORMATS -->
+  <section>
+    <div class="section-title">Export formats</div>
+    <div class="formats-grid">
+      <div class="format-card">
+        <div class="format-label">CSV</div>
+        <div class="format-desc">Excel, Google Sheets, pandas, LibreOffice</div>
+      </div>
+      <div class="format-card">
+        <div class="format-label">TSV</div>
+        <div class="format-desc">Clean tab-separated for databases</div>
+      </div>
+      <div class="format-card">
+        <div class="format-label">JSON</div>
+        <div class="format-desc">Python, jq, any JSON toolchain</div>
+      </div>
+      <div class="format-card">
+        <div class="format-label">MD</div>
+        <div class="format-desc">Obsidian, Notion, GitHub, reports</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="section-title">Features</div>
+    <div class="features">
+      <div class="feat">
+        <div class="feat-icon">🔍</div>
+        <div class="feat-text"><strong>Full bulk table</strong>Captures all rows from the mattw.io table, including all visible columns</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔁</div>
+        <div class="feat-text"><strong>Toggle overlay</strong>Click again to close — no page reload needed</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🏷️</div>
+        <div class="feat-text"><strong>Timestamped filenames</strong>Files named like <code class="inline">yt-bulk-2026-06-17T17-00.csv</code></div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🚫</div>
+        <div class="feat-text"><strong>Zero tracking</strong>No network calls, no analytics, no localStorage — just DOM and Blob download</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📋</div>
+        <div class="feat-text"><strong>Preview</strong>First 5 rows and field count visible before downloading</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔗</div>
+        <div class="feat-text"><strong>URL links</strong>Cells with links export as full URLs, not button text</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-left">
+      Made by <a href="https://provereno.media/" target="_blank" rel="noopener">Provereno.Media</a> · CC BY 4.0 ·
+      For <a href="https://mattw.io/youtube-metadata/" target="_blank" rel="noopener">MW Metadata</a> by Matt W.
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/Provereno-Media/Export-MW-Metadata-Analysis-Results" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:4px"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8c.85.004 1.71.115 2.51.337 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
+        GitHub
+      </a>
+      <a href="https://mattw.io/youtube-metadata/bulk" target="_blank" rel="noopener">↗ mattw.io/bulk</a>
+    </div>
+  </div>
+</div>
+
+<div id="notify">✓ Copied to clipboard</div>
+
+<script>
+var BOOKMARKLET = "javascript:(function()%7B%20var%20ID='__mw_bulk_exporter__';%20if(document.getElementById(ID))%7Bdocument.getElementById(ID).remove();return;%7D%20function%20esc(s)%7Breturn%20String(s??'').replace(/&/g,'&amp;').replace(/%3C/g,'&lt;').replace(/%3E/g,'&gt;');%7D%20function%20ts()%7Breturn%20new%20Date().toISOString().replace(/[:.]/g,'-').slice(0,19);%7D%20function%20dl(content,name,mime)%7B%20var%20b=new%20Blob(['%5CuFEFF'+content],%7Btype:mime%7D);%20var%20a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;%20document.body.appendChild(a);a.click();%20setTimeout(function()%7BURL.revokeObjectURL(a.href);a.remove();%7D,1000);%20%7D%20function%20extractBulkTable()%7B%20var%20tables=document.querySelectorAll('table');%20var%20best=null,bestCols=0;%20tables.forEach(function(t)%7B%20var%20ths=t.querySelectorAll('thead%20th,thead%20td');%20if(ths.length%3EbestCols)%7BbestCols=ths.length;best=t;%7D%20%7D);%20if(!best)return%7Bheaders:[],rows:[]%7D;%20var%20headers=[].slice.call(best.querySelectorAll('thead%20th,thead%20td')).map(function(th)%7Breturn%20th.innerText.trim();%7D);%20var%20rows=[].slice.call(best.querySelectorAll('tbody%20tr')).map(function(tr)%7B%20return%20[].slice.call(tr.querySelectorAll('td')).map(function(td)%7B%20var%20a=td.querySelector('a');%20if(a)%7B%20var%20title=a.innerText.trim();%20var%20href=a.href%7C%7C'';%20return%20title?title+'%20%7C%20'+href:href;%20%7D%20return%20td.innerText.trim();%20%7D);%20%7D);%20return%7Bheaders:headers,rows:rows%7D;%20%7D%20function%20toCSV(h,rows)%7B%20function%20q(v)%7Breturn'%22'+String(v??'').replace(/%22/g,'%22%22')+'%22';%7D%20return[h.map(q).join(',')].concat(rows.map(function(r)%7Breturn%20r.map(q).join(',');%7D)).join('%5Cn');%20%7D%20function%20toTSV(h,rows)%7B%20return[h.join('%5Ct')].concat(rows.map(function(r)%7Breturn%20r.join('%5Ct');%7D)).join('%5Cn');%20%7D%20function%20toJSON(h,rows)%7B%20var%20arr=rows.map(function(r)%7B%20var%20o=%7B%7D;h.forEach(function(k,i)%7Bo[k]=r[i]??'';%7D);return%20o;%20%7D);%20return%20JSON.stringify(arr,null,2);%20%7D%20function%20toMarkdown(h,rows)%7B%20var%20lines=['#%20MW%20Metadata%20Bulk%20Export','','%3E%20Source:%20'+window.location.href,'%3E%20Exported:%20'+new%20Date().toLocaleString(),''];%20var%20widths=h.map(function(c,i)%7Breturn%20Math.max(c.length,Math.max.apply(null,rows.map(function(r)%7Breturn%20String(r[i]??'').length;%7D)));%7D);%20function%20pad(s,w)%7Breturn%20String(s).slice(0,w).padEnd(w);%7D%20lines.push('%7C%20'+h.map(function(c,i)%7Breturn%20pad(c,widths[i]);%7D).join('%20%7C%20')+'%20%7C');%20lines.push('%7C%20'+widths.map(function(w)%7Breturn%20'-'.repeat(w);%7D).join('%20%7C%20')+'%20%7C');%20rows.forEach(function(r)%7Blines.push('%7C%20'+r.map(function(v,i)%7Breturn%20pad(String(v??'').replace(/%5Cn/g,'%20'),widths[i]);%7D).join('%20%7C%20')+'%20%7C');%7D);%20return%20lines.join('%5Cn');%20%7D%20var%20d=extractBulkTable();%20var%20inputEl=document.querySelector('input[aria-label],input[type=%22text%22]');%20var%20channelUrl=inputEl?inputEl.value:'';%20var%20stamp=ts();%20var%20ov=document.createElement('div');%20ov.id=ID;%20ov.setAttribute('role','dialog');%20ov.setAttribute('aria-label','MW%20Metadata%20Exporter');%20var%20styles=[%20'position:fixed','top:16px','right:16px','z-index:2147483647',%20'width:360px','max-height:calc(100vh%20-%2032px)',%20'background:#1c1b19','color:#cdccca',%20'border:1px%20solid%20#393836','border-radius:14px',%20'box-shadow:0%2016px%2048px%20rgba(0,0,0,.7)',%20'font:13px/1.5%20Inter,system-ui,sans-serif',%20'overflow:hidden','display:flex','flex-direction:column'%20].join(';');%20ov.style.cssText=styles;%20var%20previewRows=d.rows.slice(0,5);%20ov.innerHTML=[%20'%3Cdiv%20style=%22padding:14px%2016px%2010px;border-bottom:1px%20solid%20#262523;display:flex;align-items:center;justify-content:space-between;gap:8px%22%3E',%20'%3Cdiv%20style=%22display:flex;align-items:center;gap:8px%22%3E',%20'%3Csvg%20width=%2222%22%20height=%2222%22%20viewBox=%220%200%2022%2022%22%20fill=%22none%22%20style=%22flex-shrink:0%22%3E%3Crect%20width=%2222%22%20height=%2222%22%20rx=%226%22%20fill=%22#4f98a3%22%20opacity=%22.18%22/%3E%3Cpath%20d=%22M5%208h12M5%2011h8M5%2014h6%22%20stroke=%22#4f98a3%22%20stroke-width=%221.5%22%20stroke-linecap=%22round%22/%3E%3C/svg%3E',%20'%3Cdiv%3E',%20'%3Cdiv%20style=%22font-weight:600;font-size:13px;color:#e8e7e5;letter-spacing:-.01em%22%3EMW%20Bulk%20Exporter%3C/div%3E',%20'%3Cdiv%20style=%22font-size:11px;color:#5a5957%22%3Eby%20Provereno.Media%3C/div%3E',%20'%3C/div%3E',%20'%3C/div%3E',%20'%3Cbutton%20id=%22__mw_x__%22%20title=%22%D0%97%D0%B0%D0%BA%D1%80%D1%8B%D1%82%D1%8C%22%20style=%22background:none;border:none;cursor:pointer;color:#5a5957;padding:4px;border-radius:6px;line-height:1;font-size:18px%22%20onmouseenter=%22this.style.color=%5C'#cdccca%5C'%22%20onmouseleave=%22this.style.color=%5C'#5a5957%5C'%22%3E%C3%97%3C/button%3E',%20'%3C/div%3E',%20'%3Cdiv%20style=%22padding:10px%2016px;border-bottom:1px%20solid%20#262523;background:#1d1c1a%22%3E',%20'%3Cdiv%20style=%22display:flex;gap:16px%22%3E',%20'%3Cdiv%20style=%22text-align:center;flex:1%22%3E',%20'%3Cdiv%20style=%22font-size:22px;font-weight:700;color:#4f98a3;font-variant-numeric:tabular-nums%22%3E'+d.rows.length+'%3C/div%3E',%20'%3Cdiv%20style=%22font-size:10px;color:#5a5957;text-transform:uppercase;letter-spacing:.06em%22%3E%D0%B2%D0%B8%D0%B4%D0%B5%D0%BE%3C/div%3E',%20'%3C/div%3E',%20'%3Cdiv%20style=%22width:1px;background:#262523%22%3E%3C/div%3E',%20'%3Cdiv%20style=%22text-align:center;flex:1%22%3E',%20'%3Cdiv%20style=%22font-size:22px;font-weight:700;color:#4f98a3;font-variant-numeric:tabular-nums%22%3E'+d.headers.length+'%3C/div%3E',%20'%3Cdiv%20style=%22font-size:10px;color:#5a5957;text-transform:uppercase;letter-spacing:.06em%22%3E%D0%BF%D0%BE%D0%BB%D0%B5%D0%B9%3C/div%3E',%20'%3C/div%3E',%20'%3Cdiv%20style=%22width:1px;background:#262523%22%3E%3C/div%3E',%20'%3Cdiv%20style=%22text-align:center;flex:1;overflow:hidden%22%3E',%20'%3Cdiv%20style=%22font-size:11px;font-weight:500;color:#797876;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px%22%20title=%22'+esc(channelUrl)+'%22%3E'+esc(channelUrl.replace(/https?:%5C/%5C/(www%5C.)?/,'').slice(0,26)+(channelUrl.length%3E32?'%E2%80%A6':''))+'%3C/div%3E',%20'%3Cdiv%20style=%22font-size:10px;color:#5a5957;text-transform:uppercase;letter-spacing:.06em%22%3E%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB/%D0%BF%D0%BB%D0%B5%D0%B9%D0%BB%D0%B8%D1%81%D1%82%3C/div%3E',%20'%3C/div%3E',%20'%3C/div%3E',%20'%3C/div%3E',%20d.headers.length%3E0?[%20'%3Cdiv%20style=%22flex:1;overflow-y:auto;max-height:200px%22%3E',%20'%3Ctable%20style=%22width:100%25;border-collapse:collapse;font-size:11px%22%3E',%20'%3Cthead%3E%3Ctr%3E'+d.headers.map(function(h)%7Breturn'%3Cth%20style=%22position:sticky;top:0;background:#201f1d;padding:5px%2010px;text-align:left;color:#797876;font-weight:600;white-space:nowrap;border-bottom:1px%20solid%20#262523%22%3E'+esc(h)+'%3C/th%3E';%7D).join('')+'%3C/tr%3E%3C/thead%3E',%20'%3Ctbody%3E'+previewRows.map(function(r,ri)%7Breturn'%3Ctr%20style=%22background:'+(ri%252?'#1d1c1a':'#1c1b19')+'%22%3E'+r.map(function(v)%7Breturn'%3Ctd%20style=%22padding:4px%2010px;border-bottom:1px%20solid%20#1f1e1c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;color:#cdccca%22%20title=%22'+esc(v)+'%22%3E'+esc(String(v??'').slice(0,40))+'%3C/td%3E';%7D).join('')+'%3C/tr%3E';%7D).join('')+'%3C/tbody%3E',%20'%3C/table%3E',%20d.rows.length%3E5?'%3Cdiv%20style=%22padding:6px%2010px;font-size:10px;color:#5a5957;text-align:center;border-top:1px%20solid%20#262523%22%3E%E2%80%A6%D0%B5%D1%89%D1%91%20'+(d.rows.length-5)+'%20%D1%81%D1%82%D1%80%D0%BE%D0%BA%20%D0%B2%20%D1%84%D0%B0%D0%B9%D0%BB%D0%B5%3C/div%3E':'',%20'%3C/div%3E',%20].join(''):'%3Cdiv%20style=%22padding:20px;text-align:center;color:#5a5957;font-size:12px%22%3E%E2%9A%A0%20%D0%A2%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B0%20%D0%BD%D0%B5%20%D0%BD%D0%B0%D0%B9%D0%B4%D0%B5%D0%BD%D0%B0.%3Cbr%3E%D0%A1%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B0%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%B8%D1%82%D0%B5%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BD%D0%B0%20%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B5.%3C/div%3E',%20'%3Cdiv%20style=%22padding:12px%2016px;border-top:1px%20solid%20#262523;display:flex;gap:8px%22%3E',%20'%3Cbutton%20id=%22__mw_csv__%22%20style=%22flex:1;padding:8px%200;background:#01696f;color:#fff;border:none;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer;letter-spacing:.02em%22%20onmouseenter=%22this.style.background=%5C'#0c4e54%5C'%22%20onmouseleave=%22this.style.background=%5C'#01696f%5C'%22%3E%E2%AC%87%20CSV%3C/button%3E',%20'%3Cbutton%20id=%22__mw_tsv__%22%20style=%22flex:1;padding:8px%200;background:#262523;color:#cdccca;border:1px%20solid%20#393836;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer%22%20onmouseenter=%22this.style.background=%5C'#2d2c2a%5C'%22%20onmouseleave=%22this.style.background=%5C'#262523%5C'%22%3E%E2%AC%87%20TSV%3C/button%3E',%20'%3Cbutton%20id=%22__mw_json__%22%20style=%22flex:1;padding:8px%200;background:#262523;color:#cdccca;border:1px%20solid%20#393836;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer%22%20onmouseenter=%22this.style.background=%5C'#2d2c2a%5C'%22%20onmouseleave=%22this.style.background=%5C'#262523%5C'%22%3E%E2%AC%87%20JSON%3C/button%3E',%20'%3Cbutton%20id=%22__mw_md__%22%20style=%22flex:1;padding:8px%200;background:#262523;color:#cdccca;border:1px%20solid%20#393836;border-radius:8px;font:600%2012px/1%20Inter,sans-serif;cursor:pointer%22%20onmouseenter=%22this.style.background=%5C'#2d2c2a%5C'%22%20onmouseleave=%22this.style.background=%5C'#262523%5C'%22%3E%E2%AC%87%20MD%3C/button%3E',%20'%3C/div%3E',%20'%3Cdiv%20id=%22__mw_s__%22%20style=%22height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6daa45;background:#1a1f19;border-top:1px%20solid%20#262523;letter-spacing:.02em%22%3E%3C/div%3E',%20].join('');%20document.body.appendChild(ov);%20function%20notify(msg)%7B%20var%20s=document.getElementById('__mw_s__');%20if(s)%7Bs.textContent=msg;setTimeout(function()%7Bif(document.getElementById('__mw_s__'))document.getElementById('__mw_s__').textContent='';%7D,2500);%7D%20%7D%20document.getElementById('__mw_x__').addEventListener('click',function()%7Bov.remove();%7D);%20document.getElementById('__mw_csv__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toCSV(d.headers,d.rows),'yt-bulk-'+stamp+'.csv','text/csv;charset=utf-8');notify('%E2%9C%93%20CSV%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD%20('+d.rows.length+'%20%D1%81%D1%82%D1%80%D0%BE%D0%BA)');%20%7D);%20document.getElementById('__mw_tsv__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toTSV(d.headers,d.rows),'yt-bulk-'+stamp+'.tsv','text/tab-separated-values;charset=utf-8');notify('%E2%9C%93%20TSV%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD');%20%7D);%20document.getElementById('__mw_json__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toJSON(d.headers,d.rows),'yt-bulk-'+stamp+'.json','application/json');notify('%E2%9C%93%20JSON%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD');%20%7D);%20document.getElementById('__mw_md__').addEventListener('click',function()%7B%20if(!d.rows.length)%7Bnotify('%E2%9A%A0%20%D0%9D%D0%B5%D1%82%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85');return;%7D%20dl(toMarkdown(d.headers,d.rows),'yt-bulk-'+stamp+'.md','text/markdown;charset=utf-8');notify('%E2%9C%93%20Markdown%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D1%91%D0%BD');%20%7D);%0A%7D)();";
+
+// Set the href on the bookmarklet link
+document.getElementById('bm-link').href = BOOKMARKLET;
+// Show truncated code in manual section  
+document.getElementById('bm-code').textContent = BOOKMARKLET;
+
+function toggleManual(){
+  var b=document.getElementById('manual-body');
+  var t=document.getElementById('manual-toggle');
+  b.classList.toggle('visible');
+  t.classList.toggle('open');
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(BOOKMARKLET).then(function(){
+    showNotify();
+  }).catch(function(){
+    // fallback
+    var ta=document.createElement('textarea');
+    ta.value=BOOKMARKLET;
+    document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');ta.remove();
+    showNotify();
+  });
+}
+
+function showNotify(){
+  var n=document.getElementById('notify');
+  n.classList.add('show');
+  setTimeout(function(){n.classList.remove('show');},2500);
+}
+</script>
+</body>
+</html>
