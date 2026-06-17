@@ -9,7 +9,7 @@
 
 # 📊 MW Bulk Exporter
 
-**A one-click bookmarklet for [mattw.io/youtube-bulk-edit](https://mattw.io/ytcs/) and similar bulk-results pages**  
+**A one-click bookmarklet for https://mattw.io/youtube-metadata/bulk and similar bulk-results pages**  
 ([Matt Wright | GitHub](https://github.com/mattwright324))
 
 Export the **entire bulk metadata table** — videos, channels, playlists — to **CSV**, **TSV**, **JSON**, or **Markdown** instantly, in the browser, with zero setup.
