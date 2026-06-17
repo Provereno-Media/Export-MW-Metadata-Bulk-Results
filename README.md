@@ -2,7 +2,6 @@
 
 <img src="https://img.shields.io/badge/bookmarklet-browser%20only-4f98a3?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Browser only">
 <img src="https://img.shields.io/badge/formats-CSV%20·%20TSV%20·%20JSON%20·%20MD-6daa45?style=for-the-badge" alt="CSV TSV JSON MD">
-<img src="https://img.shields.io/badge/license-CC%20BY%204.0-797876?style=for-the-badge" alt="CC BY 4.0">
 <img src="https://img.shields.io/badge/tracking-none-437a22?style=for-the-badge" alt="No tracking">
 
 <br/><br/>
