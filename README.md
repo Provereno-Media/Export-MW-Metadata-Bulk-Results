@@ -18,24 +18,15 @@ Export the **entire bulk metadata table** — videos, channels, playlists — to
 
 </div>
 
-***
-
-## ✨ Features
-
-- 📋 **Detects the widest table** — automatically finds the most column-rich HTML table on the page
-- 🔗 **Preserves hyperlinks** — cells with `<a>` tags are exported as `Title | https://url`
-- 📊 **Four export formats** — CSV, TSV, JSON (array of objects), Markdown (GFM table)
-- 👁️ **Live preview panel** — shows row/field counts and a 5-row data preview before you export
-- 🔁 **Toggle overlay** — click to open, click again to close, no page reload
-- 🚫 **No server, no tracking, no dependencies** — ~5 KB, runs entirely in your browser
-- 🕓 **Timestamped filenames** — e.g. `yt-bulk-2026-06-05T18-00-00.csv`
-- 🌐 **Displays channel / playlist URL** — reads the active input field and shows it in the panel header
 
 ***
 
 ## 🚀 Installation
 
-### Option A — Manual (recommended)
+### Option A — Drag & Drop
+Open this page in a browser and just drag the button to your bookmarks bar
+
+### Option B — Manual
 
 1. Show your **Bookmarks Bar** (`Ctrl+Shift+B` / `⌘+Shift+B`)
 2. Right-click the bar → **Add page** or **Add bookmark**
