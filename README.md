@@ -81,47 +81,6 @@ This preserves both the human-readable label and the full URL in a single field,
 
 ***
 
-## 🖥️ Panel Overview
-
-When activated, the overlay panel shows:
-
-```
-┌─────────────────────────────────────────┐
-│  ▤  MW Bulk Exporter     by Provereno.Media  ×  │
-├─────────────────────────────────────────┤
-│  247 videos  │  12 fields  │ channel/url │
-├─────────────────────────────────────────┤
-│  ┌──────────────────────────────────┐   │
-│  │ Title        │ Views  │ Duration │   │  
-│  │ Video One …  │ 1.2M   │ 10:45    │   │   
-│  │ Video Two …  │ 843K   │ 8:22     │   │
-│  └──────────────────────────────────┘   │
-│  … 242 more rows in file                │
-├─────────────────────────────────────────┤
-│  ⬇ CSV   ⬇ TSV   ⬇ JSON   ⬇ MD        │
-└─────────────────────────────────────────┘
-```
-
-- **Top stats bar**: total row count, column count, and the channel/playlist URL from the input field
-- **Preview table**: first 5 rows with sticky headers, truncated at 40 characters per cell
-- **Export buttons**: one click = one download, file named `yt-bulk-YYYY-MM-DDTHH-MM-SS.<ext>`
-
-***
-
-## 🔬 How Data Is Extracted
-
-The bookmarklet scans **all `<table>` elements** on the page and selects the one with the **most `<thead>` columns** — ensuring it targets the main results grid, not any auxiliary tables.
-
-| Step | What happens |
-| :-- | :-- |
-| **1. Table detection** | Iterates all `<table>` nodes, picks the widest `<thead>` |
-| **2. Header extraction** | Reads `innerText` of all `<thead th>` / `<thead td>` |
-| **3. Row extraction** | Reads `<tbody tr>` → `<td>` cells; for linked cells: `title + " | " + href` |
-| **4. Format conversion** | Converts to the selected format in-memory, no DOM mutation |
-| **5. Download** | Creates a `Blob` with UTF-8 BOM, triggers download via temporary `<a>` |
-
-***
-
 ## 🔒 Privacy & Security
 
 - Runs **entirely in your browser** — no data leaves your machine
